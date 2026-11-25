@@ -1,0 +1,46 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+
+/* تأثير توهج احترافي للوجو والأزرار الرئيسية */
+.crave-glow {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+  transition: all 0.3s ease-in-out;
+}
+
+.crave-glow:hover {
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.45);
+  transform: translateY(-2px);
+}
+
+/* خلفية تدرج ليلية فخمة تليق بمطاعم البرجر الفخمة */
+.crave-gradient-bg {
+  background: radial-gradient(circle at top, rgba(245, 158, 11, 0.08) 0%, rgba(3, 7, 18, 1) 70%);
+}
+
+/* حركة تنعيم الصور عند مرور الماوس (Zoom Effect) */
+.crave-img-zoom {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.group:hover .crave-img-zoom {
+  transform: scale(1.08);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #030712; /* لون داكن نفس خلفية الموقع */
+  color: #ffffff;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ===== دعم اللغة العربية (RTL) ===== */
+html[lang="ar"] body {
+  font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* الـ letter-spacing بيفصل حروف العربي عن بعض، فبنلغيه في الـ RTL */
+html[dir="rtl"] * {
+  letter-spacing: normal !important;
+}

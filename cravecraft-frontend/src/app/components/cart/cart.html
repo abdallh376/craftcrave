@@ -1,0 +1,25 @@
+<div class="min-h-screen bg-gray-950 py-10 px-4 text-white">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-black mb-8 text-amber-500">{{ 'cart.title' | translate }} 🛒</h1>
+    <div *ngIf="cartItems.length === 0" class="text-center py-20 text-gray-500">
+      <p class="text-xl">{{ 'cart.empty' | translate }}</p>
+      <a routerLink="/" class="mt-4 inline-block px-6 py-2 bg-amber-500 text-white rounded-xl font-bold">{{ 'cart.browse' | translate }}</a>
+    </div>
+    <div *ngIf="cartItems.length > 0" class="space-y-4">
+      <div *ngFor="let item of cartItems" class="bg-gray-900 p-4 rounded-2xl flex items-center justify-between border border-gray-800">
+        <div class="flex items-center gap-4">
+          <img [src]="item.image" class="w-16 h-16 object-cover rounded-xl">
+          <div>
+            <h3 class="font-bold text-lg">{{ item.name }}</h3>
+            <p class="text-amber-500 text-sm">${{ item.price }} x {{ item.orderQuantity }}</p>
+          </div>
+        </div>
+        <button (click)="removeItem(item._id)" class="text-red-400 hover:text-red-300 font-bold text-sm cursor-pointer">{{ 'cart.remove' | translate }}</button>
+      </div>
+      <div class="bg-gray-900 p-6 rounded-2xl flex items-center justify-between border border-gray-800 mt-6">
+        <span class="text-xl font-black">{{ 'cart.total' | translate }}: ${{ totalPrice.toFixed(2) }}</span>
+        <a routerLink="/buy" class="px-8 py-3 bg-amber-500 text-white font-bold rounded-xl cursor-pointer">{{ 'cart.checkout' | translate }}</a>
+      </div>
+    </div>
+  </div>
+</div>

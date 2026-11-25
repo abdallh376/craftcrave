@@ -1,0 +1,93 @@
+<div class="min-h-screen crave-gradient-bg py-10 px-4 sm:px-6 lg:px-8 text-white">
+  <!-- Header Banner -->
+  <div class="text-center max-w-3xl mx-auto mb-16">
+    <span class="bg-amber-500/10 text-amber-400 text-xs font-bold px-4 py-1.5 rounded-full border border-amber-500/20 uppercase tracking-widest inline-block mb-4 shadow-sm">
+      🔥 {{ 'home.badge' | translate }}
+    </span>
+    <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4">
+      {{ 'home.titleStart' | translate }} <span class="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">{{ 'home.titleHighlight' | translate }}</span>
+    </h1>
+    <p class="text-gray-400 text-sm sm:text-base">{{ 'home.subtitle' | translate }}</p>
+  </div>
+
+  <!-- Categories Filter -->
+  <div class="flex justify-center gap-3 overflow-x-auto pb-6 mb-10">
+    <button 
+      (click)="filterCategory('All')" 
+      [ngClass]="activeCategory === 'All' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'bg-gray-900/80 text-gray-300 border border-gray-800 hover:border-amber-500 hover:text-amber-400'"
+      class="px-6 py-2.5 rounded-full font-semibold text-sm cursor-pointer transition">
+      {{ 'categories.All' | translate }}
+    </button>
+
+    <button 
+      (click)="filterCategory('Burgers')" 
+      [ngClass]="activeCategory === 'Burgers' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'bg-gray-900/80 text-gray-300 border border-gray-800 hover:border-amber-500 hover:text-amber-400'"
+      class="px-6 py-2.5 rounded-full font-semibold text-sm cursor-pointer transition">
+      🍔 {{ 'categories.Burgers' | translate }}
+    </button>
+
+    <button 
+      (click)="filterCategory('Pizza')" 
+      [ngClass]="activeCategory === 'Pizza' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'bg-gray-900/80 text-gray-300 border border-gray-800 hover:border-amber-500 hover:text-amber-400'"
+      class="px-6 py-2.5 rounded-full font-semibold text-sm cursor-pointer transition">
+      🍕 {{ 'categories.Pizza' | translate }}
+    </button>
+
+    <button 
+      (click)="filterCategory('Pasta')" 
+      [ngClass]="activeCategory === 'Pasta' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'bg-gray-900/80 text-gray-300 border border-gray-800 hover:border-amber-500 hover:text-amber-400'"
+      class="px-6 py-2.5 rounded-full font-semibold text-sm cursor-pointer transition">
+      🍝 {{ 'categories.Pasta' | translate }}
+    </button>
+  </div>
+
+  <!-- Items Grid -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div *ngFor="let item of filteredItems" class="group bg-gray-900/90 rounded-2xl overflow-hidden border border-gray-800 shadow-xl flex flex-col justify-between transition duration-300 hover:border-amber-500/50 hover:-translate-y-1">
+      
+      <!-- Image & Fav Button -->
+      <div class="relative h-48 bg-gray-800 overflow-hidden">
+        <img [src]="item.image" [alt]="item.name" class="w-full h-full object-cover cursor-pointer crave-img-zoom" [routerLink]="['/item', item._id]">
+        <span class="absolute top-3 start-3 bg-gray-900/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-amber-400 border border-amber-500/20 shadow">${{ item.price }}</span>
+        <button (click)="toggleFavorite(item)" class="absolute top-3 end-3 bg-gray-900/90 backdrop-blur-md p-2.5 rounded-full text-xs cursor-pointer hover:scale-125 transition border border-gray-700/50 shadow">
+          {{ isFavorite(item._id) ? '❤️' : '🤍' }}
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="p-5 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 [routerLink]="['/item', item._id]" class="font-bold text-lg mb-1.5 cursor-pointer hover:text-amber-500 transition line-clamp-1">{{ item.name }}</h3>
+          <p class="text-gray-400 text-xs line-clamp-2 mb-5 leading-relaxed">{{ item.description }}</p>
+        </div>
+
+        <!-- منطقة تفاعلية للزرار أو التحكم بالكمية -->
+        <div>
+          <!-- الحالة الأولى: لم يتم الإضافة بعد -->
+          <button *ngIf="!item.orderQuantity || item.orderQuantity === 0" 
+                  (click)="addToCart(item)" 
+                  class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-2.5 rounded-xl font-bold text-sm cursor-pointer transition crave-glow flex items-center justify-center gap-2">
+            <span>{{ 'home.addToCart' | translate }}</span> 🛒
+          </button>
+
+          <!-- الحالة الثانية: تم الإضافة (يظهر شريط التحكم بالكمية + و -) -->
+          <div *ngIf="item.orderQuantity > 0" class="flex items-center justify-between bg-gray-800 rounded-xl p-1.5 border border-gray-700">
+            <button (click)="decreaseQuantity(item)" class="w-9 h-9 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold flex items-center justify-center transition-all cursor-pointer">
+              -
+            </button>
+            
+            <span class="text-white font-bold text-sm px-4">
+              {{ item.orderQuantity }}
+            </span>
+
+            <button (click)="increaseQuantity(item)" class="w-9 h-9 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold flex items-center justify-center transition-all cursor-pointer">
+              +
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

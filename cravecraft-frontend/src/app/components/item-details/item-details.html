@@ -1,0 +1,19 @@
+<div class="min-h-screen bg-gray-950 py-12 px-4 text-white flex items-center justify-center">
+  <div *ngIf="item" class="max-w-4xl w-full bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 grid grid-cols-1 md:grid-cols-2">
+    <div class="h-80 md:h-full bg-gray-800">
+      <img [src]="item.image" class="w-full h-full object-cover">
+    </div>
+    <div class="p-8 flex flex-col justify-between">
+      <div>
+        <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full">{{ 'categories.' + item.category | translate }}</span>
+        <h1 class="text-3xl font-black mt-4 mb-2">{{ item.name }}</h1>
+        <p class="text-2xl font-black text-amber-500 mb-4">${{ item.price }}</p>
+        <p class="text-gray-400 text-sm leading-relaxed mb-6">{{ item.description }}</p>
+      </div>
+      <div class="flex gap-4">
+        <button (click)="addToCart()" class="flex-1 py-4 bg-amber-500 font-bold rounded-xl cursor-pointer">{{ 'item.addToCart' | translate }} 🛒</button>
+        <a routerLink="/" class="px-6 py-4 bg-gray-800 text-center font-bold rounded-xl cursor-pointer">{{ 'item.back' | translate }}</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,244 @@
+<div class="min-h-screen bg-gray-950 text-white">
+  
+  <!-- Admin Navbar -->
+  <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center shadow-md">
+    <div class="flex items-center gap-3">
+      <span class="text-xl">🍔</span>
+      <span class="font-black text-lg tracking-tight text-white">CraveCraft <span class="text-amber-500 text-xs px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">Admin</span></span>
+    </div>
+    <div class="flex items-center gap-4">
+      <app-language-switcher></app-language-switcher>
+      <a routerLink="/" class="text-sm font-semibold text-gray-300 hover:text-amber-400 transition">{{ 'dashboard.home' | translate }} 🏠</a>
+      <button (click)="logout()" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition border border-red-600/30 cursor-pointer">
+        {{ 'dashboard.logout' | translate }} 🚪
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-8">
+    
+    <!-- Header & Tabs -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-800 pb-6">
+      <div>
+        <span class="bg-amber-500/10 text-amber-400 text-xs font-bold px-3 py-1 rounded-full border border-amber-500/20 uppercase tracking-widest">
+          ⚡ {{ 'dashboard.panelBadge' | translate }}
+        </span>
+        <h1 class="text-3xl font-black text-white mt-2 tracking-tight">{{ 'dashboard.heading' | translate }}</h1>
+      </div>
+      
+      <div class="flex bg-gray-900 p-1.5 rounded-2xl border border-gray-800">
+        <button 
+          (click)="switchTab('orders')"
+          [ngClass]="activeTab === 'orders' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-gray-400 hover:text-white'"
+          class="px-5 py-2 rounded-xl text-sm font-bold transition cursor-pointer">
+          📦 {{ 'dashboard.tabOrders' | translate }}
+        </button>
+        <button 
+          (click)="switchTab('products')"
+          [ngClass]="activeTab === 'products' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-gray-400 hover:text-white'"
+          class="px-5 py-2 rounded-xl text-sm font-bold transition cursor-pointer">
+          🍔 {{ 'dashboard.tabProducts' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= TAB 1: ORDERS MANAGEMENT ================= -->
+    <div *ngIf="activeTab === 'orders'" class="space-y-6">
+      <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl shadow-lg flex gap-4 items-center">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (input)="searchOrders()"
+          [placeholder]="'dashboard.searchPlaceholder' | translate" 
+          class="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition">
+        <button (click)="searchOrders()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 py-3 rounded-xl text-sm transition cursor-pointer shadow-lg shadow-amber-500/20">
+          {{ 'dashboard.search' | translate }} 🔍
+        </button>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+          <h3 class="font-bold text-lg text-white">{{ 'dashboard.ordersTitle' | translate }}</h3>
+          <span class="text-xs text-gray-400">{{ 'dashboard.totalOrders' | translate }}: {{ filteredOrders.length }}</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-start border-collapse">
+            <thead>
+              <tr class="bg-gray-950/60 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
+                <th class="py-4 px-6">{{ 'dashboard.thOrder' | translate }}</th>
+                <th class="py-4 px-6">{{ 'dashboard.thCustomer' | translate }}</th>
+                <th class="py-4 px-6">{{ 'dashboard.thMeals' | translate }}</th>
+                <th class="py-4 px-6">{{ 'dashboard.thNotes' | translate }} 📝</th>
+                <th class="py-4 px-6">{{ 'dashboard.thTotalStatus' | translate }}</th>
+                <th class="py-4 px-6 text-center">{{ 'dashboard.thActions' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 text-sm">
+              <tr *ngFor="let order of filteredOrders" class="hover:bg-gray-800/40 transition">
+                <td class="py-4 px-6">
+                  <span class="font-bold text-amber-400 block">#{{ order._id || order.id }}</span>
+                  <span class="text-xs text-gray-500">{{ order.createdAt | date:'short' }}</span>
+                </td>
+                
+                <td class="py-4 px-6">
+                  <span class="font-semibold text-white block">
+                    {{ order.userDetails?.fullName || order.customerName || order.customer || ('dashboard.customer' | translate) }}
+                  </span>
+                  <span class="text-xs text-amber-400 font-bold block mt-1" dir="ltr">
+                    📞 {{ order.userDetails?.phone || order.phone || ('dashboard.notAvailable' | translate) }}
+                  </span>
+                  <span class="text-xs text-gray-400 block mt-1">
+                    📍 {{ order.userDetails?.address || order.address || ('dashboard.defaultAddress' | translate) }}
+                  </span>
+                </td>
+
+                <td class="py-4 px-6">
+                  <div class="space-y-1.5 max-w-xs">
+                    <div *ngFor="let item of order.items" class="bg-gray-950/60 p-2 rounded-lg border border-gray-800/60 text-xs flex justify-between items-center">
+                      <span class="font-bold text-white">{{ item.name || item.product?.name }}</span>
+                      <span class="text-amber-400 font-semibold">x{{ item.orderQuantity || item.quantity }} (${{ item.price }})</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- سجل الملاحظات المتعددة بالتاريخ -->
+                <td class="py-4 px-6 min-w-[260px]">
+                  <div class="space-y-2 mb-3">
+                    <div *ngFor="let note of order.notes" class="bg-gray-950 p-2.5 rounded-xl border border-gray-800 text-xs shadow-sm">
+                      <p class="text-gray-200 font-medium">{{ note.text }}</p>
+                      <span class="text-[10px] text-amber-400 block mt-1 font-semibold">{{ note.createdAt | date:'short' }}</span>
+                    </div>
+                  </div>
+                  <!-- حقل إضافة ملاحظة جديدة مع التاريخ -->
+                  <div class="flex gap-2">
+                    <input 
+                      type="text" 
+                      #noteInput
+                      [placeholder]="'dashboard.addNotePlaceholder' | translate" 
+                      class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 transition">
+                    <button 
+                      (click)="addOrderNote(order._id || order.id, noteInput.value); noteInput.value=''"
+                      class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer shadow-md">
+                      {{ 'dashboard.add' | translate }}
+                    </button>
+                  </div>
+                </td>
+
+                <td class="py-4 px-6">
+                  <span class="font-black text-white text-base block mb-1">${{ order.totalAmount || order.total }}</span>
+                  <span [ngClass]="{
+                    'bg-yellow-500/10 text-yellow-400 border-yellow-500/20': order.status === 'opened' || order.status === 'Pending',
+                    'bg-green-500/10 text-green-400 border-green-500/20': order.status === 'closed' || order.status === 'Delivered'
+                  }" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border inline-block">
+                    {{ 'status.' + (order.status || 'opened') | translate }}
+                  </span>
+                </td>
+
+                <td class="py-4 px-6 text-center">
+                  <div class="flex justify-center gap-2">
+                  <button (click)="updateStatus(order, 'Delivered')" class="bg-green-600/20 hover:bg-green-600 text-green-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition border border-green-600/30 cursor-pointer">{{ 'dashboard.deliver' | translate }}</button>
+                  <button (click)="updateStatus(order, 'Preparing')" class="bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition border border-blue-600/30 cursor-pointer">{{ 'dashboard.prepare' | translate }}</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 2: PRODUCTS MANAGEMENT ================= -->
+    <div *ngIf="activeTab === 'products'" class="space-y-8">
+      <div class="bg-gray-900 border border-gray-800 p-8 rounded-3xl shadow-xl">
+        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+          <span>✨</span> {{ 'dashboard.addProductTitle' | translate }}
+        </h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">{{ 'dashboard.pName' | translate }}</label>
+            <input type="text" [(ngModel)]="newProduct.name" [placeholder]="'dashboard.pNamePlaceholder' | translate" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">{{ 'dashboard.pPrice' | translate }}</label>
+            <input type="number" [(ngModel)]="newProduct.price" placeholder="9.99" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">{{ 'dashboard.pStock' | translate }}</label>
+            <input type="number" [(ngModel)]="newProduct.stock" placeholder="50" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">{{ 'dashboard.pCategory' | translate }}</label>
+            <select [(ngModel)]="newProduct.category" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500">
+              <option value="Burgers">{{ 'categories.Burgers' | translate }}</option>
+              <option value="Pizza">{{ 'categories.Pizza' | translate }}</option>
+              <option value="Pasta">{{ 'categories.Pasta' | translate }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-400 mb-2">{{ 'dashboard.pImage' | translate }}</label>
+            <input type="text" [(ngModel)]="newProduct.image" placeholder="https://..." class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-xs font-bold text-gray-400 mb-2">{{ 'dashboard.pDescription' | translate }}</label>
+          <textarea [(ngModel)]="newProduct.description" [placeholder]="'dashboard.pDescriptionPlaceholder' | translate" rows="2" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <button (click)="addProduct()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold px-8 py-3 rounded-xl text-sm transition cursor-pointer shadow-lg shadow-amber-500/20">
+          ➕ {{ 'dashboard.addProductBtn' | translate }}
+        </button>
+      </div>
+
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+          <h3 class="font-bold text-lg text-white">{{ 'dashboard.productsTitle' | translate }}</h3>
+          <span class="text-xs text-gray-400">{{ 'dashboard.totalProducts' | translate }}: {{ products.length }}</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-start border-collapse">
+            <thead>
+              <tr class="bg-gray-950/60 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
+                <th class="py-4 px-6">{{ 'dashboard.thProduct' | translate }}</th>
+                <th class="py-4 px-6">{{ 'dashboard.thCategory' | translate }}</th>
+                <th class="py-4 px-6">{{ 'dashboard.thPrice' | translate }}</th>
+                <th class="py-4 px-6">{{ 'dashboard.thStock' | translate }}</th>
+                <th class="py-4 px-6 text-center">{{ 'dashboard.thActive' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800 text-sm">
+              <tr *ngFor="let p of products" class="hover:bg-gray-800/40 transition">
+                <td class="py-4 px-6 font-bold text-white flex items-center gap-3">
+                  <img *ngIf="p.image" [src]="p.image" class="w-10 h-10 rounded-lg object-cover border border-gray-700">
+                  <span>{{ p.name }}</span>
+                </td>
+                <td class="py-4 px-6 text-amber-400 font-semibold">{{ 'categories.' + p.category | translate }}</td>
+                <td class="py-4 px-6 font-black text-white">${{ p.price }}</td>
+                
+                <!-- عرض المخزون مع معالجة حقل 0 أو القيم الفارغة بشكل صحيح -->
+                <td class="py-4 px-6">
+                  <span class="bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-xs font-bold inline-block">
+                    📦 {{ (p.stock !== undefined && p.stock !== null) ? p.stock : (p.quantity !== undefined && p.quantity !== null ? p.quantity : 10) }} {{ 'dashboard.pieces' | translate }}
+                  </span>
+                </td>
+                
+                <!-- زرار تبديل الحالة Active / Deactive -->
+                <td class="py-4 px-6 text-center">
+                  <button 
+                    (click)="toggleProductStatus(p)" 
+                    [ngClass]="p.isActive !== false ? 'bg-green-600/20 text-green-400 border-green-600/30 hover:bg-green-600 hover:text-white' : 'bg-gray-800 text-gray-400 border-gray-700 hover:bg-gray-700 hover:text-white'"
+                    class="px-4 py-2 rounded-xl text-xs font-bold transition border cursor-pointer">
+                    {{ p.isActive !== false ? '🟢' : '🔴' }} {{ (p.isActive !== false ? 'dashboard.active' : 'dashboard.inactive') | translate }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

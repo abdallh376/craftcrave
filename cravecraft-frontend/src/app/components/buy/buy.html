@@ -1,0 +1,283 @@
+
+<div class="min-h-screen bg-gray-950 py-12 px-4 flex items-center justify-center relative">
+
+  <!-- نموذج إتمام الطلب: يظهر قبل نجاح الدفع فقط -->
+  <div
+    *ngIf="!showModal || modalType !== 'success'"
+    class="max-w-xl w-full bg-gray-900 p-8 rounded-3xl border border-gray-800 shadow-xl"
+  >
+    <h2 class="text-2xl font-black text-white mb-2">
+      {{ 'buy.title' | translate }} 🚀
+    </h2>
+
+    <form (submit)="confirmBeforeOrder()" class="space-y-4">
+
+      <!-- الاسم بالكامل -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 mb-1">
+          {{ 'buy.fullName' | translate }}
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="orderData.fullName"
+          name="fullName"
+          required
+          class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-amber-500"
+        >
+      </div>
+
+      <!-- البريد الإلكتروني -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 mb-1">
+          {{ 'buy.email' | translate }}
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="orderData.email"
+          name="email"
+          required
+          placeholder="name@example.com"
+          class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-amber-500"
+        >
+      </div>
+
+      <!-- رقم الهاتف -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 mb-1">
+          {{ 'buy.phone' | translate }}
+        </label>
+        <input
+          type="tel"
+          [(ngModel)]="orderData.phone"
+          name="phone"
+          required
+          class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-amber-500"
+        >
+      </div>
+
+      <!-- العنوان -->
+      <div>
+        <label class="block text-xs font-bold text-gray-400 mb-1">
+          {{ 'buy.address' | translate }}
+        </label>
+        <textarea
+          [(ngModel)]="orderData.address"
+          name="address"
+          rows="3"
+          required
+          class="w-full px-4 py-3 rounded-xl bg-gray-800 border border-gray-700 text-white focus:outline-none focus:border-amber-500"
+        ></textarea>
+      </div>
+
+      <!-- زر إتمام الطلب -->
+      <button
+        type="submit"
+        [disabled]="isLoading"
+        class="w-full py-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold cursor-pointer transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+      >
+        <span
+          *ngIf="isLoading"
+          class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+        ></span>
+
+        <span>
+          {{ (isLoading ? 'buy.processing' : 'buy.placeOrder') | translate }}
+        </span>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- نافذة التأكيد أو الفاتورة المنبثقة -->
+  <div
+    *ngIf="showModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+  >
+    <div
+      class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-md relative text-start max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200"
+    >
+
+      <!-- الحالة الأولى: تأكيد الطلب قبل الإرسال -->
+      <div
+        *ngIf="modalType === 'confirm'"
+        class="flex flex-col items-center text-center"
+      >
+
+        <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-3 shadow-inner">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-1">
+          {{ 'buy.confirmTitle' | translate }}
+        </h3>
+
+        <p class="text-xs text-gray-500 mb-6">
+          {{ 'buy.confirmText' | translate }}
+        </p>
+
+        <div class="flex gap-3 w-full">
+
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition-all text-sm"
+          >
+            {{ 'buy.cancel' | translate }}
+          </button>
+
+          <button
+            type="button"
+            (click)="placeOrder()"
+            [disabled]="isLoading"
+            class="w-1/2 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-amber-500/20 text-sm flex items-center justify-center gap-2"
+          >
+            <span
+              *ngIf="isLoading"
+              class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></span>
+
+            <span>
+              {{ (isLoading ? 'buy.sending' : 'buy.confirmYes') | translate }}
+            </span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- الحالة الثانية: فاتورة النجاح بعد الدفع -->
+      <div
+        *ngIf="modalType === 'success'"
+        class="flex flex-col items-center text-center"
+      >
+
+        <!-- زر الإغلاق -->
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="absolute top-4 end-4 text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+
+        <!-- علامة النجاح -->
+        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-3 shadow-inner">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="3"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-1">
+          {{ 'buy.successTitle' | translate }} 🎉
+        </h3>
+
+        <p class="text-xs text-gray-500 mb-4">
+          {{ 'buy.successText' | translate }}
+        </p>
+
+        <!-- المنتجات المطلوبة -->
+        <div class="w-full bg-gray-50 rounded-2xl p-3 mb-4 border border-gray-100 text-start space-y-2">
+
+          <p class="text-xs font-bold text-gray-500 border-b pb-1">
+            {{ 'buy.products' | translate }}
+          </p>
+
+          <div class="max-h-32 overflow-y-auto space-y-1.5 pe-1">
+
+            <div
+              *ngFor="let item of (createdOrder?.savedOrder?.items || createdOrder?.items)"
+              class="flex justify-between items-center text-xs border-b border-gray-100 pb-1"
+            >
+              <span class="text-gray-800 font-medium">
+                {{ item.name }}
+                <span class="text-gray-400">
+                  (x{{ item.orderQuantity }})
+                </span>
+              </span>
+
+              <span class="font-bold text-gray-700">
+                {{ item.price * item.orderQuantity }}
+                {{ 'buy.currency' | translate }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- الإجمالي ورقم الطلب -->
+        <div class="w-full bg-gray-50 rounded-2xl p-3 mb-6 border border-gray-100 text-start space-y-2">
+
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">
+              {{ 'buy.grandTotal' | translate }}
+            </span>
+
+            <span class="font-bold text-gray-800">
+              {{ createdOrder?.savedOrder?.totalAmount || createdOrder?.totalAmount || 0 }}
+              {{ 'buy.currency' | translate }}
+            </span>
+          </div>
+
+          <div class="flex justify-between text-xs border-t border-gray-200 pt-2">
+            <span class="text-gray-500">
+              {{ 'buy.orderNumber' | translate }}
+            </span>
+
+            <span class="font-mono font-bold text-gray-800" dir="ltr">
+              #{{ createdOrder?.savedOrder?._id || createdOrder?._id || '---' }}
+            </span>
+          </div>
+
+        </div>
+
+        <!-- زر الاستمرار -->
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-green-600/30 text-sm"
+        >
+          {{ 'buy.continue' | translate }}
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

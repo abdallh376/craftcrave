@@ -1,0 +1,29 @@
+<nav class="bg-gray-900/90 backdrop-blur-md border-b border-amber-500/20 sticky top-0 z-50 px-6 py-4 shadow-xl">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <!-- Logo with Special Craft Badge -->
+    <a routerLink="/" class="text-2xl font-black text-white tracking-wider flex items-center gap-2 group">
+      <span class="bg-amber-500/20 p-2 rounded-2xl group-hover:rotate-12 transition duration-300">🍔</span>
+      <span class="bg-gradient-to-r from-white via-gray-200 to-amber-500 bg-clip-text text-transparent">
+        Crave<span class="text-amber-500">Craft</span>
+      </span>
+    </a>
+
+    <!-- Nav Links & Icons -->
+    <div class="flex items-center gap-6">
+      <app-language-switcher></app-language-switcher>
+      <a routerLink="/" class="text-gray-300 hover:text-amber-500 font-semibold text-sm transition">{{ 'nav.home' | translate }}</a>
+      
+      <!-- Favorites Icon -->
+      <a routerLink="/favorites" class="relative text-gray-300 hover:text-red-500 transition flex items-center gap-1 font-semibold text-sm bg-gray-800/50 px-3 py-2 rounded-xl border border-gray-700/50">
+        <span>❤️ {{ 'nav.favorites' | translate }}</span>
+        <span *ngIf="favCount > 0" class="absolute -top-2 -end-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse">{{ favCount }}</span>
+      </a>
+
+      <!-- Cart Icon -->
+      <a routerLink="/cart" class="relative bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 crave-glow transition">
+        <span>🛒 {{ 'nav.cart' | translate }}</span>
+        <span *ngIf="cartCount > 0" class="bg-white text-amber-700 text-xs px-2 py-0.5 rounded-full font-black shadow">{{ cartCount }}</span>
+      </a>
+    </div>
+  </div>
+</nav>
